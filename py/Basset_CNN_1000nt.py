@@ -164,10 +164,10 @@ class MyDataset(Dataset):
     def to_tensor_list(data):
         data = data.reset_index(drop = True)
         tensor_list = []
-        NT_dict = {'A':[1,0,0,0],'T':[0,1,0,0],'G':[0,0,1,0],'C':[0,0,0,1],'N':[0,0,0,0]}
+        NT_dict = {'A':[1,0,0,0],'U':[0,1,0,0],'G':[0,0,1,0],'C':[0,0,0,1],'N':[0,0,0,0]}
         tag_dict = {'0': 0, '1':1}
         for i in range(len(data)):
-            seq_tensor = torch.tensor([ NT_dict[j] for j in data.loc[i,"cdna"]],dtype=torch.float32)
+            seq_tensor = torch.tensor([NT_dict[j] for j in data.loc[i,"cdna"]],dtype=torch.float32)
             label_tensor = torch.tensor(tag_dict[str(data.loc[i,"tag"])],dtype=torch.float32)
             tensor_list.append([seq_tensor,label_tensor])
         return tensor_list
@@ -442,9 +442,10 @@ if __name__ == "__main__":
     #Rebuild dataset with fixed length (1000nt,3' bias)
     dataset["cdna"] = dataset["cdna"].apply(fix_seq)
     # split the train,validate and test (~ 7:2:1)
-    data_train_validate, data_test = train_test_split(dataset.iloc[:,2:4], test_size = 0.1, random_state = 100)
+    data_train_validate, data_test = train_test_split(dataset.iloc[:,0:4], test_size = 0.1, random_state = 100)
     data_train,data_validate = train_test_split(data_train_validate, test_size = 0.2, random_state = 100)
     #convert to Dataset
+    print(data_train)
     TrainSet = MyDataset(data_train)
     ValidateSet = MyDataset(data_validate)
     TestSet = MyDataset(data_test)
